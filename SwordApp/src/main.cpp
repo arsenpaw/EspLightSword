@@ -1,35 +1,29 @@
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
+#include "SwordService.h"
 
-#define LED_PIN   3
+#define LED_PIN   10
 #define LED_COUNT 120
 
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
+Sword sword(&strip);
 
 void setup() {
   USBSerial.begin(115200);
   strip.begin();
   strip.show();
+  
+  sword.setBrightness(50);
 }
 
 void loop() {
-  for (int b = 0; b <= 50; b++) {
-    strip.setBrightness(b);
-    for (int i = 0; i < LED_COUNT; i++) {
-      strip.setPixelColor(i, strip.Color(255, 255, 255));
-    }
-    strip.show();
-    USBSerial.printf("Fade in: %d\n", b);
-    delay(5);
-  }
-
-  for (int b = 50; b >= 0; b--) {
-    strip.setBrightness(b);
-    for (int i = 0; i < LED_COUNT; i++) {
-      strip.setPixelColor(i, strip.Color(255, 255, 255));
-    }
-    strip.show();
-    USBSerial.printf("Fade out: %d\n", b);
-    delay(5);
-  }
+  USBSerial.println("Sword ON");
+  sword.on();
+  
+  delay(2000);
+  
+  // USBSerial.println("Sword OFF");
+  // sword.off();
+  
+  delay(2000);
 }
