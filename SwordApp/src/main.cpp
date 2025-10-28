@@ -1,59 +1,60 @@
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
-#include "SwordService.h"
-#include "AudioPlayer.h"
+#include "LightSwordService.h"
 
 #define LED_PIN   10
 #define LED_COUNT 120
-#define AUDIO_PATH "/lightsaber.mp3"
-#define BCK_PIN 6
-#define WS_PIN 7  
+#define BCK_PIN 7
+#define WS_PIN 6  
 #define DIN_PIN 8
 
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
-Sword sword(&strip);
 SwordAudioPlayer audioPlayer(BCK_PIN, WS_PIN, DIN_PIN);
+LightSwordService lightSword(&strip, &audioPlayer);
 
 void setup() {
-  Serial.begin(115200);
-  strip.begin();
-  strip.show();
+  USBSerial.begin(115200);
+  USBSerial.println("Starting LightSword...");
   
-  sword.setBrightness(50);
-  sword.setColor(0, 255, 0); // Green lightsaber
-  
-  // Initialize audio player
-  if (!audioPlayer.init()) {
-    Serial.println("Failed to initialize audio player");
-  } else {
-    Serial.println("Audio player ready");
+  // Initialize the combined lightsaber service
+  if (!lightSword.init()) {
+    USBSerial.println("Failed to initialize LightSword service");
+    while(1) delay(1000);
   }
+  
+  // Configure lightsaber
+  lightSword.setBrightness(100);
+  lightSword.setColor(SwordColor::GREEN);
+  lightSword.setAnimationSpeed(10); // Fast ignition
+  
+  // Set custom sound files (optional)
+  lightSword.setSounds("/ignition.mp3", "/hum.mp3", "/clash.mp3", "/extinguish.mp3");
+  
+  USBSerial.println("LightSword ready!");
 }
 
 void loop() {
   static unsigned long lastAction = 0;
-  static bool swordState = false;
+  static unsigned long lastClash = 0;
   
-  // Handle audio streaming
-  audioPlayer.loop();
+  // Handle lightsaber processing (audio + LEDs)
+  lightSword.loop();
   
-  // Toggle sword every 5 seconds
-  if (millis() - lastAction > 5000) {
-    if (!swordState) {
-      Serial.println("Lightsaber ON");
-      sword.on();
-      
-      // Play lightsaber ignition sound after LED animation starts
-      if (audioPlayer.isInitialized()) {
-        audioPlayer.play(AUDIO_PATH);
-      }
-      swordState = true;
+  // Demo: Toggle sword every 8 seconds
+  if (millis() - lastAction > 8000) {
+    if (!lightSword.isOn()) {
+      lightSword.ignite();
     } else {
-      Serial.println("Lightsaber OFF");
-      audioPlayer.stop();
-      sword.off();
-      swordState = false;
+      lightSword.extinguish();
     }
     lastAction = millis();
   }
+  
+  // Demo: Random clash effects every 15 seconds when sword is on
+  // if (lightSword.isOn() && millis() - lastClash > 15000) {
+  //   if (random(0, 100) < 30) { // 30% chance
+  //     lightSword.clash();
+  //     lastClash = millis();
+  //   }
+  // }
 }

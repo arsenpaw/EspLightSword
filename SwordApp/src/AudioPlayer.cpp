@@ -28,7 +28,7 @@ SwordAudioPlayer::~SwordAudioPlayer() {
 
 bool SwordAudioPlayer::init() {
     if (!initSPIFFS()) {
-        Serial.println("SPIFFS init failed");
+        USBSerial.println("SPIFFS init failed");
         return false;
     }
     
@@ -39,7 +39,7 @@ bool SwordAudioPlayer::init() {
     player = new AudioPlayer(*source, *i2s, *decoder);
     
     if (!source || !i2s || !decoder || !player) {
-        Serial.println("Failed to create audio components");
+        USBSerial.println("Failed to create audio components");
         return false;
     }
     
@@ -53,29 +53,29 @@ bool SwordAudioPlayer::init() {
     cfg.channels = 2;
     
     if (!i2s->begin(cfg)) {
-        Serial.println("I2S begin failed");
+        USBSerial.println("I2S begin failed");
         return false;
     }
     
     // Setup player
     player->setMetadataCallback(printMetaData);
     if (!player->begin()) {
-        Serial.println("Player begin failed");
+        USBSerial.println("Player begin failed");
         return false;
     }
     
     initialized = true;
-    Serial.println("Arduino Audio Tools player initialized");
+    USBSerial.println("Arduino Audio Tools player initialized");
     return true;
 }
 
 bool SwordAudioPlayer::play(const char* filepath) {
     if (!initialized || !player) {
-        Serial.println("Player not initialized");
+        USBSerial.println("Player not initialized");
         return false;
     }
     
-    Serial.printf("Playing: %s\n", filepath);
+    USBSerial.printf("Playing: %s\n", filepath);
     
     // Set the specific file to play
     source->setPath(filepath);
@@ -107,8 +107,8 @@ bool SwordAudioPlayer::initSPIFFS() {
 }
 
 void SwordAudioPlayer::printMetaData(MetaDataType type, const char* str, int len) {
-    Serial.print("==> ");
-    Serial.print(toStr(type));
-    Serial.print(": ");
-    Serial.println(str);
+    USBSerial.print("==> ");
+    USBSerial.print(toStr(type));
+    USBSerial.print(": ");
+    USBSerial.println(str);
 }
