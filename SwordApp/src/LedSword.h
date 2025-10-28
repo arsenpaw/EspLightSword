@@ -2,7 +2,7 @@
 
 #include <Adafruit_NeoPixel.h>
 
-class Sword {
+class LedSword {
 private:
     Adafruit_NeoPixel* strip;
     bool isOn;
@@ -13,7 +13,7 @@ private:
     void fadeOut();
     
 public:
-    Sword(Adafruit_NeoPixel* ledStrip);
+    LedSword(Adafruit_NeoPixel* ledStrip);
     
     void on();
     void off();

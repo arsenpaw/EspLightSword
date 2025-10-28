@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
-#include "LightSwordService.h"
+#include "Lightsaber.h"
+#include "LedSword.h"
 
 #define LED_PIN   10
 #define LED_COUNT 120
@@ -10,7 +11,8 @@
 
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 SwordAudioPlayer audioPlayer(BCK_PIN, WS_PIN, DIN_PIN);
-LightSwordService lightSword(&strip, &audioPlayer);
+LedSword ledSword(&strip);
+Lightsaber lightSword(&ledSword, &audioPlayer);
 
 void setup() {
   USBSerial.begin(115200);
@@ -36,12 +38,9 @@ void setup() {
 void loop() {
   static unsigned long lastAction = 0;
   static unsigned long lastClash = 0;
-  
-  // Handle lightsaber processing (audio + LEDs)
+
   lightSword.loop();
-  
-  // Demo: Toggle sword every 8 seconds
-  if (millis() - lastAction > 8000) {
+  if (millis() - lastAction > 15000) {
     if (!lightSword.isOn()) {
       lightSword.ignite();
     } else {

@@ -65,11 +65,13 @@ bool SwordAudioPlayer::init() {
     }
     
     initialized = true;
+    setVolume(0.5);
     USBSerial.println("Arduino Audio Tools player initialized");
     return true;
 }
 
 bool SwordAudioPlayer::play(const char* filepath) {
+    player->stop();
     if (!initialized || !player) {
         USBSerial.println("Player not initialized");
         return false;
@@ -104,6 +106,13 @@ void SwordAudioPlayer::loop() {
 
 bool SwordAudioPlayer::initSPIFFS() {
     return SPIFFS.begin(true);
+}
+
+void SwordAudioPlayer::setVolume(float volume) {
+    if (player && initialized) {
+        player->setVolume(volume);
+        USBSerial.printf("Volume set to: %.2f\n", volume);
+    }
 }
 
 void SwordAudioPlayer::printMetaData(MetaDataType type, const char* str, int len) {

@@ -1,6 +1,6 @@
-#include "SwordService.h"
+#include "LedSword.h"
 
-Sword::Sword(Adafruit_NeoPixel* ledStrip) {
+LedSword::LedSword(Adafruit_NeoPixel* ledStrip) {
     strip = ledStrip;
     isOn = false;
     brightness = 50;
@@ -8,19 +8,21 @@ Sword::Sword(Adafruit_NeoPixel* ledStrip) {
 }
 
 
-void Sword::on() {
+void LedSword::on() {
     if (!isOn) {
+        USBSerial.println("Sword igniting");
         fadeIn();
     }
 }
 
-void Sword::off() {
+void LedSword::off() {
     if (isOn) {
+        USBSerial.println("Sword extinguishing");
         fadeOut();
     }
 }
 
-void Sword::setBrightness(uint8_t newBrightness) {
+void LedSword::setBrightness(uint8_t newBrightness) {
     brightness = newBrightness;
     if (isOn) {
         strip->setBrightness(brightness);
@@ -28,7 +30,7 @@ void Sword::setBrightness(uint8_t newBrightness) {
     }
 }
 
-void Sword::setColor(uint8_t red, uint8_t green, uint8_t blue) {
+void LedSword::setColor(uint8_t red, uint8_t green, uint8_t blue) {
     currentColor = strip->Color(red, green, blue);
     if (isOn) {
         for (int i = 0; i < strip->numPixels(); i++) {
@@ -38,7 +40,7 @@ void Sword::setColor(uint8_t red, uint8_t green, uint8_t blue) {
     }
 }
 
-void Sword::setColor(uint32_t color) {
+void LedSword::setColor(uint32_t color) {
     currentColor = color;
     if (isOn) {
         for (int i = 0; i < strip->numPixels(); i++) {
@@ -48,17 +50,16 @@ void Sword::setColor(uint32_t color) {
     }
 }
 
-bool Sword::getState() {
+bool LedSword::getState() {
     return isOn;
 }
 
-uint8_t Sword::getBrightness() {
+uint8_t LedSword::getBrightness() {
     return brightness;
 }
 
-void Sword::fadeIn() {
+void LedSword::fadeIn() {
     if (isOn) return;
-    isOn = true;
     uint8_t pixelsNum = strip->numPixels();
     int delay_per_pixel = 10;
     int oneSideLength = pixelsNum / 2;
@@ -71,10 +72,12 @@ void Sword::fadeIn() {
     }
     strip->setPixelColor(oneSideLength, currentColor);
     strip->show();
+    isOn = true;
+    USBSerial.println("Sword fully ignited");
 
 }
 
-void Sword::fadeOut() {
+void LedSword::fadeOut() {
     if (!isOn) return;
     uint8_t pixelsNum = strip->numPixels();
     int delay_per_pixel = 10;
@@ -89,4 +92,5 @@ void Sword::fadeOut() {
     isOn = false;
     strip->clear();
     strip->show();
+    USBSerial.println("Sword extinguished");
 }

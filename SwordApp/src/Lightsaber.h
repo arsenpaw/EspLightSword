@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
 #include "AudioPlayer.h"
-
+#include "LedSword.h"
 enum class SwordState {
     OFF,
     IGNITING,
@@ -20,9 +20,9 @@ enum class SwordColor {
     WHITE
 };
 
-class LightSwordService {
+class Lightsaber {
 private:
-    Adafruit_NeoPixel* strip;
+    LedSword* ledSword;
     SwordAudioPlayer* audioPlayer;
     
     SwordState currentState;
@@ -44,7 +44,7 @@ private:
     bool animationDirection;
     
 public:
-    LightSwordService(Adafruit_NeoPixel* ledStrip, SwordAudioPlayer* audio);
+    Lightsaber(LedSword* ledSword, SwordAudioPlayer* audio);
     
     bool init();
     void loop();
@@ -66,16 +66,8 @@ public:
     bool isAnimating() const;
     
 private:
-    // LED animations
-    void updateIgnitionAnimation();
-    void updateExtinguishAnimation();
-    void updateIdleHum();
-    void setAllPixels(uint32_t color);
-    void clearStrip();
-    
     // Color helpers
-    uint32_t getSwordColor() const;
-    uint32_t dimColor(uint32_t color, float factor) const;
+    void setLedSwordColor();
     
     // Audio helpers
     void playIgnitionSound();

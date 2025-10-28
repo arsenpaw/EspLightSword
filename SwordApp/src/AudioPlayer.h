@@ -28,6 +28,7 @@ public:
     void stop();
     bool isInitialized();
     void loop();
+    void setVolume(float volume);
     
 private:
     bool initSPIFFS();
